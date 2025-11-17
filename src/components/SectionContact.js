@@ -7,204 +7,176 @@ import {
   TextInput,
   Pressable,
   Alert,
-  Linking,
+  useWindowDimensions,
 } from 'react-native';
 
 const RED = '#e63946';
+const RED_DARK = '#c53030';
 const PURPLE = '#7c3aed';
 const BLACK = '#111111';
-const BG = '#fff8d9';
 const CARD_BG = '#ffffff';
 
-const WHATSAPP_NUMBER = '5521989036236'; // DDI + DDD + número (só dígitos)
-const CONTACT_EMAIL = 'leoblins@gmail.com';
+// 🔧 TROQUE PELOS DADOS DO SEU EMAILJS
+const EMAILJS_SERVICE_ID = 'service_uzxe2wl';
+const EMAILJS_TEMPLATE_ID = 'template_7xlryar';
+const EMAILJS_PUBLIC_KEY = 'MV7k_epzp81BIW1FV';
 
 export default function SectionContact() {
+  const { height, width } = useWindowDimensions();
+  const isMobile = width < 768;
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [isHoverSubmit, setIsHoverSubmit] = useState(false);
+  const [isPressSubmit, setIsPressSubmit] = useState(false);
+
   function validateEmail(value) {
-    // validação simples só pra evitar coisa muito errada
     return /\S+@\S+\.\S+/.test(value);
   }
 
-  function handleSubmit() {
-    if (!name || !email || !subject || !message) {
-      Alert.alert('Ops!', 'Preencha todos os campos antes de enviar ✍️');
+  async function handleSubmit() {
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      Alert.alert('Campos obrigatórios', 'Preencha Nome, E-mail e Mensagem.');
       return;
     }
 
-    if (!validateEmail(email)) {
+    if (!validateEmail(email.trim())) {
       Alert.alert('E-mail inválido', 'Digite um e-mail válido.');
       return;
     }
 
-    const mailSubject = `[CaiCai Papelaria] ${subject}`;
-    const mailBody =
-      `Nome: ${name}\n` +
-      `E-mail: ${email}\n\n` +
-      `Mensagem:\n${message}\n`;
+    setIsSubmitting(true);
+    setSuccessMsg('');
 
-    const mailtoUrl =
-      `mailto:${CONTACT_EMAIL}` +
-      `?subject=${encodeURIComponent(mailSubject)}` +
-      `&body=${encodeURIComponent(mailBody)}`;
+    const templateParams = {
+      from_name: name,
+      from_email: email,
+      subject: subject || 'Sem assunto',
+      message,
+    };
 
-    Linking.openURL(mailtoUrl).catch(() => {
-      Alert.alert(
-        'Não foi possível abrir o e-mail',
-        'Tente novamente ou use o WhatsApp para entrar em contato.'
+    try {
+      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id: EMAILJS_SERVICE_ID,
+          template_id: EMAILJS_TEMPLATE_ID,
+          user_id: EMAILJS_PUBLIC_KEY,
+          template_params: templateParams,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao enviar');
+      }
+
+      setSuccessMsg(
+        'Mensagem enviada com sucesso! Entrarei em contato em breve.'
       );
-    });
-  }
-
-  function handleOpenWhatsApp() {
-    if (!message) {
+      setName('');
+      setEmail('');
+      setSubject('');
+      setMessage('');
+    } catch (err) {
       Alert.alert(
-        'Mensagem vazia',
-        'Escreva a mensagem no campo de mensagem antes de abrir o WhatsApp 😉'
+        'Erro ao enviar',
+        'Não foi possível enviar sua mensagem. Verifique sua conexão ou tente novamente mais tarde.'
       );
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const text =
-      `Olá, meu nome é ${name || '(não informado)'}.\n` +
-      `Assunto: ${subject || '(não informado)'}\n\n` +
-      `${message}`;
-
-    const url =
-      `https://wa.me/${WHATSAPP_NUMBER}` +
-      `?text=${encodeURIComponent(text)}`;
-
-    Linking.openURL(url).catch(() => {
-      Alert.alert(
-        'Não foi possível abrir o WhatsApp',
-        'Verifique se o aplicativo está instalado ou tente pelo navegador.'
-      );
-    });
   }
 
-  function handleOpenMailDirect() {
-    const url = `mailto:${CONTACT_EMAIL}`;
-    Linking.openURL(url);
-  }
+  const showButtonActive = isHoverSubmit || isPressSubmit || isSubmitting;
 
   return (
-    <View style={styles.section}>
-      <View style={styles.inner}>
+    <View style={[styles.section, { minHeight: height * 0.95 }]}>
+      <View style={[styles.inner, isMobile && { maxWidth: 600 }]}>
         <Text style={styles.title}>Contato</Text>
         <Text style={styles.subtitle}>
           Fale com a gente para orçamentos, dúvidas e pedidos especiais.
         </Text>
 
-        <View style={styles.row}>
-          {/* FORMULÁRIO */}
-          <View style={styles.formCard}>
-            <View style={styles.field}>
-              <Text style={styles.label}>Nome</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Seu nome completo"
-                placeholderTextColor="#b5b5b5"
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
+        {/* MENSAGEM DE SUCESSO */}
+        {successMsg ? (
+          <View style={styles.successBox}>
+            <Text style={styles.successText}>{successMsg}</Text>
+          </View>
+        ) : null}
 
-            <View style={styles.field}>
-              <Text style={styles.label}>E-mail</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="seuemail@exemplo.com"
-                placeholderTextColor="#b5b5b5"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-              />
-            </View>
-
-            <View style={styles.field}>
-              <Text style={styles.label}>Assunto</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Orçamento, dúvida, kit personalizado..."
-                placeholderTextColor="#b5b5b5"
-                value={subject}
-                onChangeText={setSubject}
-              />
-            </View>
-
-            <View style={styles.field}>
-              <Text style={styles.label}>Mensagem</Text>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Como podemos te ajudar?"
-                placeholderTextColor="#b5b5b5"
-                multiline
-                textAlignVertical="top"
-                value={message}
-                onChangeText={setMessage}
-              />
-            </View>
-
-            <Pressable style={styles.submitButton} onPress={handleSubmit}>
-              <Text style={styles.submitButtonText}>Enviar mensagem por e-mail</Text>
-            </Pressable>
-
-            <Pressable
-              style={[styles.submitButton, styles.whatsButton]}
-              onPress={handleOpenWhatsApp}
-            >
-              <Text style={styles.submitButtonText}>
-                Enviar mensagem pelo WhatsApp
-              </Text>
-            </Pressable>
+        {/* FORMULÁRIO */}
+        <View style={styles.formCard}>
+          <View style={styles.field}>
+            <Text style={styles.label}>Nome*</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite seu nome"
+              placeholderTextColor="#b5b5b5"
+              value={name}
+              onChangeText={setName}
+            />
           </View>
 
-          {/* OUTROS CONTATOS */}
-          <View style={styles.infoCard}>
-            <Text style={styles.infoTitle}>Outros canais</Text>
-
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>WhatsApp</Text>
-              <Pressable onPress={handleOpenWhatsApp}>
-                <Text style={styles.infoValue}>(21) 99999-9999</Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>E-mail</Text>
-              <Pressable onPress={handleOpenMailDirect}>
-                <Text style={styles.infoValue}>{CONTACT_EMAIL}</Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Endereço</Text>
-              <Text style={styles.infoValue}>
-                Rua da Papelaria, 123 – Niterói/RJ
-              </Text>
-            </View>
-
-            <View style={[styles.infoItem, { marginTop: 16 }]}>
-              <Text style={styles.infoLabel}>Horário de atendimento</Text>
-              <Text style={styles.infoValue}>
-                Segunda a sexta: 9h às 18h{'\n'}
-                Sábados: 9h às 13h
-              </Text>
-            </View>
-
-            <View style={styles.tipBox}>
-              <Text style={styles.tipTitle}>Dica 💡</Text>
-              <Text style={styles.tipText}>
-                Se preferir, descreva os itens da lista escolar ou do seu
-                escritório. A gente monta o orçamento completo pra você!
-              </Text>
-            </View>
+          <View style={styles.field}>
+            <Text style={styles.label}>E-mail*</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite seu e-mail"
+              placeholderTextColor="#b5b5b5"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
           </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>Assunto</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite o assunto (opcional)"
+              placeholderTextColor="#b5b5b5"
+              value={subject}
+              onChangeText={setSubject}
+            />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>Mensagem*</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Digite sua mensagem"
+              placeholderTextColor="#b5b5b5"
+              multiline
+              textAlignVertical="top"
+              value={message}
+              onChangeText={setMessage}
+            />
+          </View>
+
+          <Pressable
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+            onHoverIn={() => setIsHoverSubmit(true)}
+            onHoverOut={() => setIsHoverSubmit(false)}
+            onPressIn={() => setIsPressSubmit(true)}
+            onPressOut={() => setIsPressSubmit(false)}
+            style={[
+              styles.submitButton,
+              showButtonActive && styles.submitButtonActive,
+              isSubmitting && { opacity: 0.8 },
+            ]}
+          >
+            <Text style={styles.submitButtonText}>
+              {isSubmitting ? 'Enviando...' : 'Enviar Mensagem'}
+            </Text>
+          </Pressable>
         </View>
       </View>
     </View>
@@ -213,39 +185,49 @@ export default function SectionContact() {
 
 const styles = StyleSheet.create({
   section: {
-    backgroundColor: BG,
+    width: '100%',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 16,
     paddingVertical: 40,
     alignItems: 'center',
   },
   inner: {
     width: '100%',
-    maxWidth: 1100,
+    maxWidth: 720,
   },
   title: {
-    fontSize: 22,
+    fontSize: 32,
     fontWeight: 'bold',
     color: RED,
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: 16,
     color: PURPLE,
     textAlign: 'center',
     marginBottom: 24,
   },
-  row: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 20,
+
+  successBox: {
+    backgroundColor: '#d1fae5',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  successText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#047857',
+    fontWeight: '500',
   },
 
   formCard: {
-    flexBasis: '60%',
     backgroundColor: CARD_BG,
     borderRadius: 20,
-    padding: 18,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
@@ -253,89 +235,41 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   field: {
-    marginBottom: 12,
+    marginBottom: 14,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: BLACK,
-    marginBottom: 4,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#f3c77a',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 13,
-    backgroundColor: '#fff',
-  },
-  textArea: {
-    minHeight: 100,
-  },
-  submitButton: {
-    marginTop: 12,
-    backgroundColor: RED,
-    borderRadius: 999,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  whatsButton: {
-    backgroundColor: '#25D366',
-    marginTop: 8,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 13,
-  },
-
-  infoCard: {
-    flexBasis: '35%',
-    backgroundColor: CARD_BG,
-    borderRadius: 20,
-    padding: 18,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  infoTitle: {
     fontSize: 16,
-    fontWeight: '700',
-    color: RED,
-    marginBottom: 12,
-  },
-  infoItem: {
-    marginBottom: 8,
-  },
-  infoLabel: {
-    fontSize: 13,
     fontWeight: '600',
-    color: BLACK,
-  },
-  infoValue: {
-    fontSize: 13,
-    color: '#444',
-  },
-  tipBox: {
-    marginTop: 16,
-    padding: 12,
-    borderRadius: 12,
-    backgroundColor: '#fff3bf',
-    borderLeftWidth: 3,
-    borderLeftColor: PURPLE,
-  },
-  tipTitle: {
-    fontSize: 13,
-    fontWeight: '700',
     color: PURPLE,
     marginBottom: 4,
   },
-  tipText: {
-    fontSize: 12,
-    color: BLACK,
-    lineHeight: 18,
+  input: {
+    borderWidth: 2,
+    borderColor: '#f3c77a',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    fontSize: 16,
+    backgroundColor: '#fff',
+  },
+  textArea: {
+    minHeight: 110,
+  },
+  submitButton: {
+    marginTop: 16,
+    backgroundColor: RED,
+    borderRadius: 999,
+    paddingVertical: 11,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+  },
+  submitButtonActive: {
+    backgroundColor: RED_DARK,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
   },
 });
