@@ -152,7 +152,7 @@ export default function App() {
     });
   }
 
-  // ÍCONES SOCIAIS
+  // ÍCONES SOCIAIS DO HEADER
   function handleOpenWhatsAppIcon() {
     Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`).catch(() =>
       Alert.alert('Erro', 'Não foi possível abrir o WhatsApp.')
@@ -215,7 +215,12 @@ export default function App() {
           <SectionContact />
         </View>
 
-        <Footer />
+        <Footer
+          onNavHome={() => goToHomeSection('hero')}
+          onNavAbout={() => goToHomeSection('about')}
+          onNavProducts={() => goToHomeSection('products')}
+          onNavContact={() => goToHomeSection('contact')}
+        />
       </ScrollView>
     );
   }
