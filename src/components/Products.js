@@ -1,5 +1,3 @@
-// src/components/Products.js
-
 const PRODUCTS = [
   {
     id: '1',

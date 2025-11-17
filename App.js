@@ -17,11 +17,12 @@ import SectionContact from './src/components/SectionContact';
 import Footer from './src/components/Footer';
 import ProductCatalog from './src/components/ProductCatalog';
 import CartPage from './src/components/CartPage';
+import CartSidePanel from './src/components/CartSidePanel';
 
 const WHATSAPP_NUMBER = '5521989036236';
 
 export default function App() {
-  const [view, setView] = useState('home'); // 'home' | 'catalog' | 'cart'
+  const [view, setView] = useState('home'); 
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -34,13 +35,11 @@ export default function App() {
   });
   const [pendingSection, setPendingSection] = useState(null);
 
-  // salva a posição de cada seção
   const handleSectionLayout = (section) => (event) => {
     const { y } = event.nativeEvent.layout;
     sectionPositions.current[section] = y;
   };
 
-  // quando a view volta para home e tem seção pendente, faz o scroll
   useEffect(() => {
     if (view === 'home' && pendingSection && scrollRef.current) {
       const y = sectionPositions.current[pendingSection] || 0;
@@ -63,7 +62,6 @@ export default function App() {
       }
       return [...current, { product, quantity: 1 }];
     });
-    setIsCartOpen(true);
   }
 
   function updateQuantity(productId, delta) {
@@ -111,7 +109,7 @@ export default function App() {
     0
   );
 
-  function handleCheckout() {
+  function handleCheckout(extraInfo) {
     if (!cartItems.length) {
       Alert.alert(
         'Carrinho vazio',
@@ -134,11 +132,21 @@ export default function App() {
       )
       .join('\n');
 
+    let dadosCliente = '';
+    if (extraInfo && (extraInfo.name || extraInfo.address)) {
+      dadosCliente =
+        `Dados do cliente:\n` +
+        (extraInfo.name ? `Nome: ${extraInfo.name}\n` : '') +
+        (extraInfo.address ? `Endereço: ${extraInfo.address}\n` : '') +
+        '\n';
+    }
+
     const mensagem =
       `Olá! Gostaria de finalizar uma compra na CaiCai Papelaria.\n\n` +
-      `Itens selecionados:\n${itensTexto}\n\n` +
-      `Total: R$ ${total.toFixed(2).replace('.', ',')}\n\n` +
-      `Por favor, me informe as opções de entrega e pagamento.`;
+      dadosCliente +
+      `Itens selecionados:\n` +
+      `${itensTexto}\n\n` +
+      `Total: R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
 
     const url =
       `https://wa.me/${WHATSAPP_NUMBER}` +
@@ -151,8 +159,6 @@ export default function App() {
       );
     });
   }
-
-  // ÍCONES SOCIAIS DO HEADER
   function handleOpenWhatsAppIcon() {
     Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`).catch(() =>
       Alert.alert('Erro', 'Não foi possível abrir o WhatsApp.')
@@ -175,7 +181,6 @@ export default function App() {
   if (view === 'catalog') {
     content = (
       <ProductCatalog
-        onBack={() => goToHomeSection('products')}
         onAddToCart={addToCart}
       />
     );
@@ -187,7 +192,7 @@ export default function App() {
         onIncrement={(id) => updateQuantity(id, +1)}
         onDecrement={(id) => updateQuantity(id, -1)}
         onRemove={removeFromCart}
-        onCheckout={handleCheckout}
+        onCheckout={() => handleCheckout()}
       />
     );
   } else {
@@ -243,6 +248,17 @@ export default function App() {
         onOpenInstagram={handleOpenInstagram}
       />
       {content}
+
+      {/* PAINEL LATERAL DO CARRINHO */}
+      <CartSidePanel
+        visible={isCartOpen}
+        cartItems={cartItems}
+        onClose={() => setIsCartOpen(false)}
+        onIncrement={(id) => updateQuantity(id, +1)}
+        onDecrement={(id) => updateQuantity(id, -1)}
+        onRemove={removeFromCart}
+        onCheckout={handleCheckout}
+      />
     </View>
   );
 }

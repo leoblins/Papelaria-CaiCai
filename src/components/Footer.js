@@ -1,4 +1,3 @@
-// src/components/Footer.js
 import React, { useMemo, useState } from 'react';
 import {
   View,
@@ -22,8 +21,7 @@ export default function Footer({
 }) {
   const { width } = useWindowDimensions();
   const { styles } = useMemo(() => createStyles(width), [width]);
-  const [hoverItem, setHoverItem] = useState(null); // 'home' | 'about' | 'prod' | 'contato' | 'email'
-
+  const [hoverItem, setHoverItem] = useState(null);
   function handleEmailClick() {
     Linking.openURL('mailto:vitordiniz2706@gmail.com').catch(() => {});
   }
@@ -31,9 +29,7 @@ export default function Footer({
   return (
     <View style={styles.wrapper}>
       <View style={styles.inner}>
-        {/* LINHA SUPERIOR */}
         <View style={styles.topRow}>
-          {/* ESQUERDA - ENDEREÇO */}
           <View style={styles.colLeft}>
             <Text style={styles.brandName}>CAI CAI PAPELARIA</Text>
             <Text style={styles.addressLine}>
@@ -44,7 +40,6 @@ export default function Footer({
             </Text>
           </View>
 
-          {/* CENTRO - MENU */}
           <View style={styles.colCenter}>
             <Pressable
               onPress={onNavHome}
@@ -107,7 +102,6 @@ export default function Footer({
             </Pressable>
           </View>
 
-          {/* DIREITA - HORÁRIO */}
           <View style={styles.colRight}>
             <Text style={styles.hoursTitle}>Horário de Funcionamento</Text>
             <Text style={styles.hoursLine}>
@@ -122,7 +116,6 @@ export default function Footer({
         {/* LINHA DIVISÓRIA */}
         <View style={styles.divider} />
 
-        {/* RODAPÉ INFERIOR */}
         <View style={styles.bottomArea}>
           <Text style={styles.bottomText}>
             Cai Cai Papelaria. Todos os direitos reservados.
@@ -184,7 +177,6 @@ function createStyles(width) {
       marginBottom: 12,
     },
 
-    // ESQUERDA
     colLeft: {
       flexShrink: 1,
     },
@@ -199,7 +191,6 @@ function createStyles(width) {
       color: '#4b3f3f',
     },
 
-    // CENTRO
     colCenter: {
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -215,7 +206,7 @@ function createStyles(width) {
       color: RED,
     },
 
-    // DIREITA
+  
     colRight: {
       alignItems: isMobile ? 'flex-start' : 'flex-end',
     },
@@ -230,7 +221,7 @@ function createStyles(width) {
       color: '#4b3f3f',
     },
 
-    // LINHA
+
     divider: {
       height: 1,
       backgroundColor: 'rgba(0,0,0,0.12)',
@@ -238,7 +229,7 @@ function createStyles(width) {
       marginBottom: 8,
     },
 
-    // PARTE INFERIOR
+ 
     bottomArea: {
       alignItems: 'center',
       paddingBottom: 4,

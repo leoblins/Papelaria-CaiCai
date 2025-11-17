@@ -1,4 +1,3 @@
-// src/components/SectionProducts.js
 import React, { useMemo } from 'react';
 import {
   View,
@@ -15,7 +14,6 @@ const RED = '#e63946';
 const PURPLE = '#7c3aed';
 const SHADOW = 'rgba(0,0,0,0.12)';
 
-// 🔥 AGORA USANDO require() EM VEZ DE URL
 const HIGHLIGHT_PRODUCTS = [
   {
     id: 'real-madrid-caderno',
@@ -44,15 +42,11 @@ export default function SectionProducts({ onSeeMore, onAddToCart }) {
   return (
     <View style={styles.section}>
       <View style={styles.inner}>
-        {/* TÍTULO */}
         <Text style={styles.title}>Nossos Produtos</Text>
-
-        {/* SUBTÍTULO */}
         <Text style={styles.subtitle}>
           Confira alguns dos itens mais procurados da nossa loja.
         </Text>
 
-        {/* GRID DE PRODUTOS */}
         <View style={styles.grid}>
           {HIGHLIGHT_PRODUCTS.map((product) => (
             <Pressable
@@ -96,7 +90,6 @@ export default function SectionProducts({ onSeeMore, onAddToCart }) {
           ))}
         </View>
 
-        {/* BOTÃO VER MAIS */}
         <Pressable
           onPress={onSeeMore}
           style={({ hovered, pressed }) => [
@@ -120,7 +113,6 @@ function createStyles(width, height) {
   if (isSmall) cardSize = '100%';
 
   const webTransition = {
-    // essas propriedades só fazem efeito no web
     transitionDuration: '150ms',
     transitionProperty: 'transform',
     transitionTimingFunction: 'ease-out',

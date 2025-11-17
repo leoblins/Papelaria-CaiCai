@@ -1,4 +1,3 @@
-// src/components/ProductCatalog.js
 import React, { useMemo, useState } from "react";
 import {
   View,
@@ -25,7 +24,7 @@ export default function ProductCatalog({ onAddToCart }) {
 
   const [search, setSearch] = useState("");
   const [searchApplied, setSearchApplied] = useState(false);
-  const [sortPrice, setSortPrice] = useState(""); // '' | 'asc' | 'desc'
+  const [sortPrice, setSortPrice] = useState("");
 
   function normalize(str) {
     return str
@@ -37,7 +36,6 @@ export default function ProductCatalog({ onAddToCart }) {
   function applyFilters() {
     let list = [...PRODUCTS];
 
-    // 🔍 APLICA BUSCA
     if (searchApplied && search.trim() !== "") {
       const term = normalize(search);
       list = list.filter(
@@ -47,7 +45,7 @@ export default function ProductCatalog({ onAddToCart }) {
       );
     }
 
-    // 💰 APLICA ORDENAR PREÇO
+
     if (sortPrice === "asc") {
       list.sort((a, b) => a.price - b.price);
     } else if (sortPrice === "desc") {
@@ -74,17 +72,13 @@ export default function ProductCatalog({ onAddToCart }) {
       <View style={styles.section}>
         <View style={styles.inner}>
 
-          {/* TÍTULO */}
           <Text style={styles.title}>Catálogo Completo</Text>
 
-          {/* SUBTÍTULO */}
           <Text style={styles.subtitle}>
             Navegue por todos os produtos disponíveis na CaiCai Papelaria
           </Text>
 
-          {/* 🔍 BARRA DE PESQUISA + FILTRO DE PREÇO */}
           <View style={styles.searchRow}>
-            {/* Campo de texto */}
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar produto..."
@@ -99,7 +93,6 @@ export default function ProductCatalog({ onAddToCart }) {
               <Text style={styles.searchBtnText}>🔎</Text>
             </Pressable>
 
-            {/* Select (WEB ONLY) */}
             <select
               value={sortPrice}
               onChange={(e) => setSortPrice(e.target.value)}
@@ -126,7 +119,6 @@ export default function ProductCatalog({ onAddToCart }) {
             ) : null}
           </View>
 
-          {/* GRID DE PRODUTOS */}
           <View style={styles.grid}>
             {filtered.map((product) => (
               <Pressable
@@ -167,10 +159,6 @@ export default function ProductCatalog({ onAddToCart }) {
     </ScrollView>
   );
 }
-
-/* ------------------------------------------------------- */
-/* ---------------------- ESTILOS ------------------------- */
-/* ------------------------------------------------------- */
 
 function createStyles(width, height) {
   const isSmall = width < 700;

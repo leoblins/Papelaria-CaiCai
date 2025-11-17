@@ -1,4 +1,3 @@
-// src/components/Hero.js
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -47,7 +46,7 @@ export default function Hero() {
   const currentSlide = CAROUSEL_SLIDES[carouselIndex];
 
   const isMobile = width < 768;
-  // altura do banner: ocupa boa parte da tela, mas com limite
+
   const bannerHeight = Math.max(
     320,
     Math.min(height * (isMobile ? 0.6 : 0.8), 560)

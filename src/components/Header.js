@@ -1,11 +1,9 @@
-// src/components/Header.js
 import React, { useState, useMemo, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
-  ScrollView,
   useWindowDimensions,
   Animated,
 } from 'react-native';
@@ -18,7 +16,7 @@ const PURPLE = '#4b2faf';
 export default function Header({
   cartItems = [],
   totalItems = 0,
-  isCartOpen = false,
+  isCartOpen = false, 
   onToggleCart,
   onGoToCart,
   onNavHome,
@@ -31,32 +29,21 @@ export default function Header({
 }) {
   const { width } = useWindowDimensions();
 
-  // estilos responsivos + tamanhos de ícone
   const { styles, iconSize, cartIconSize } = useMemo(
     () => createStyles(width),
     [width]
   );
 
-  // estado de hover do MENU (cor vermelha)
-  const [hoverMenu, setHoverMenu] = useState(null); // 'home' | 'about' | 'prod' | 'contato'
+  const [hoverMenu, setHoverMenu] = useState(null);
 
-  // valores animados para escala suave dos ícones
   const scaleIg = useRef(new Animated.Value(1)).current;
   const scaleFb = useRef(new Animated.Value(1)).current;
   const scaleWpp = useRef(new Animated.Value(1)).current;
   const scaleCart = useRef(new Animated.Value(1)).current;
 
-  const firstItems = cartItems.slice(0, 4);
-  const hasMore = cartItems.length > 4;
-
-  const totalValue = cartItems.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
-
   function animateHoverIn(scaleValue) {
     Animated.timing(scaleValue, {
-      toValue: 1.15, // 15% maior
+      toValue: 1.15,
       duration: 150,
       useNativeDriver: true,
     }).start();
@@ -159,7 +146,7 @@ export default function Header({
               )}
             </View>
 
-            {/* ÍCONES SOCIAIS (escala suave no hover) */}
+            {/* ÍCONES SOCIAIS */}
             <View style={styles.socialArea}>
               <Pressable
                 onPress={onOpenInstagram}
@@ -204,7 +191,6 @@ export default function Header({
               </Pressable>
             </View>
 
-            {/* CARRINHO (escala suave no hover) */}
             <Pressable
               style={styles.cartButton}
               onPress={onToggleCart}
@@ -229,71 +215,11 @@ export default function Header({
             </Pressable>
           </View>
         </View>
-
-        {/* DROPDOWN DO CARRINHO */}
-        {isCartOpen && (
-          <View style={styles.dropdown}>
-            {cartItems.length === 0 ? (
-              <Text style={styles.dropdownEmpty}>
-                Seu carrinho está vazio.
-              </Text>
-            ) : (
-              <>
-                <ScrollView style={{ maxHeight: 220 }}>
-                  {firstItems.map((item) => (
-                    <View key={item.product.id} style={styles.dropdownItem}>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.dropdownName} numberOfLines={1}>
-                          {item.product.name}
-                        </Text>
-                        <Text style={styles.dropdownDetail}>
-                          {item.quantity}x R${' '}
-                          {item.product.price.toFixed(2).replace('.', ',')}
-                        </Text>
-                      </View>
-                      <Text style={styles.dropdownTotal}>
-                        R${' '}
-                        {(item.product.price * item.quantity)
-                          .toFixed(2)
-                          .replace('.', ',')}
-                      </Text>
-                    </View>
-                  ))}
-                  {hasMore && (
-                    <Text style={styles.dropdownMore}>
-                      + {cartItems.length - firstItems.length} itens no carrinho
-                    </Text>
-                  )}
-                </ScrollView>
-
-                <View style={styles.dropdownFooter}>
-                  <Text style={styles.dropdownTotalLabel}>
-                    Total:{' '}
-                    <Text style={styles.dropdownTotalValue}>
-                      R$ {totalValue.toFixed(2).replace('.', ',')}
-                    </Text>
-                  </Text>
-                  <Pressable
-                    style={styles.dropdownButton}
-                    onPress={onGoToCart}
-                  >
-                    <Text style={styles.dropdownButtonText}>
-                      Ir para o carrinho
-                    </Text>
-                  </Pressable>
-                </View>
-              </>
-            )}
-          </View>
-        )}
       </View>
     </View>
   );
 }
 
-/**
- * Estilos responsivos + tamanhos de ícone
- */
 function createStyles(width) {
   const isMobile = width < 600;
   const isTablet = width >= 600 && width < 1024;
@@ -322,7 +248,7 @@ function createStyles(width) {
     header: {
       flexDirection: isMobile ? 'column' : 'row',
       justifyContent: isMobile ? 'flex-start' : 'space-between',
-      alignItems: isMobile ? 'center' : 'center',
+      alignItems: 'center',
       gap: isMobile ? 12 : 16,
     },
     logoArea: {
@@ -388,7 +314,7 @@ function createStyles(width) {
     cartButton: {
       marginLeft: isMobile ? 0 : 4,
       marginTop: isMobile ? 8 : 0,
-      padding: isMobile ? 6 : 6,
+      padding: 6,
       borderRadius: 999,
       backgroundColor: '#fff8e1',
       position: 'relative',
@@ -413,77 +339,7 @@ function createStyles(width) {
       fontSize: 10,
       fontWeight: '700',
     },
-    dropdown: {
-      marginTop: 8,
-      marginLeft: 'auto',
-      width: isMobile ? '100%' : 320,
-      backgroundColor: '#ffffff',
-      borderRadius: 16,
-      padding: 12,
-    },
-    dropdownEmpty: {
-      fontSize: baseFont,
-      color: '#666',
-    },
-    dropdownItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 8,
-    },
-    dropdownName: {
-      fontSize: baseFont,
-      fontWeight: '600',
-      color: '#222',
-    },
-    dropdownDetail: {
-      fontSize: baseFont - 1,
-      color: '#666',
-    },
-    dropdownTotal: {
-      fontSize: baseFont,
-      fontWeight: '600',
-      color: RED,
-      marginLeft: 8,
-    },
-    dropdownMore: {
-      fontSize: baseFont - 1,
-      color: '#777',
-      marginTop: 4,
-    },
-    dropdownFooter: {
-      borderTopWidth: 1,
-      borderTopColor: '#f3f3f3',
-      paddingTop: 8,
-      marginTop: 4,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    dropdownTotalLabel: {
-      fontSize: baseFont,
-      color: '#444',
-    },
-    dropdownTotalValue: {
-      fontWeight: '700',
-      color: RED,
-    },
-    dropdownButton: {
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 999,
-      backgroundColor: RED,
-    },
-    dropdownButtonText: {
-      color: '#fff',
-      fontSize: baseFont - 1,
-      fontWeight: '600',
-    },
   });
 
-  return {
-    styles,
-    iconSize,
-    cartIconSize,
-  };
+  return { styles, iconSize, cartIconSize };
 }

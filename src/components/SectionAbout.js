@@ -1,4 +1,3 @@
-// src/components/SectionAbout.js
 import React from 'react';
 import {
   View,
@@ -27,14 +26,12 @@ export default function SectionAbout() {
           Uma papelaria feita para quem ama organização, cor e criatividade.
         </Text>
 
-        {/* BLOCO 1 */}
         <View
           style={[
             styles.topRow,
             isMobile && { flexDirection: 'column', gap: 20 },
           ]}
         >
-          {/* FOTO */}
           <View
             style={[
               styles.photoWrapper,
@@ -47,7 +44,6 @@ export default function SectionAbout() {
             />
           </View>
 
-          {/* TEXTO */}
           <View
             style={[
               styles.textWrapper,
@@ -97,7 +93,6 @@ export default function SectionAbout() {
             </Text>
           </View>
 
-          {/* CERTIFICADO */}
           <View
             style={[
               styles.certificateWrapper,
@@ -115,8 +110,6 @@ export default function SectionAbout() {
   );
 }
 
-/* ------------------ ESTILOS ------------------ */
-
 const styles = StyleSheet.create({
   section: {
     width: '100%',
@@ -130,7 +123,6 @@ const styles = StyleSheet.create({
     maxWidth: 1280,
   },
 
-  /* TEXTOS */
   sectionTitle: {
     fontSize: 32,
     fontWeight: 'bold',
@@ -145,7 +137,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
 
-  /* BLOCO 1 */
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -175,7 +166,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  /* BLOCO 2 */
   bottomRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -206,7 +196,7 @@ const styles = StyleSheet.create({
   certificatePhoto: {
     width: '100%',
     aspectRatio: 4 / 3,
-    maxHeight: 320, // ↑ imagem maior
+    maxHeight: 320, 
     borderRadius: 18,
   },
 });

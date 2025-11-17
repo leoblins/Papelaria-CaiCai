@@ -1,4 +1,3 @@
-// src/components/SectionContact.js
 import React, { useState } from 'react';
 import {
   View,
@@ -16,7 +15,6 @@ const PURPLE = '#7c3aed';
 const BLACK = '#111111';
 const CARD_BG = '#ffffff';
 
-// 🔧 TROQUE PELOS DADOS DO SEU EMAILJS
 const EMAILJS_SERVICE_ID = 'service_uzxe2wl';
 const EMAILJS_TEMPLATE_ID = 'template_7xlryar';
 const EMAILJS_PUBLIC_KEY = 'MV7k_epzp81BIW1FV';
@@ -103,14 +101,12 @@ export default function SectionContact() {
           Fale com a gente para orçamentos, dúvidas e pedidos especiais.
         </Text>
 
-        {/* MENSAGEM DE SUCESSO */}
         {successMsg ? (
           <View style={styles.successBox}>
             <Text style={styles.successText}>{successMsg}</Text>
           </View>
         ) : null}
 
-        {/* FORMULÁRIO */}
         <View style={styles.formCard}>
           <View style={styles.field}>
             <Text style={styles.label}>Nome*</Text>
