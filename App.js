@@ -1,12 +1,12 @@
 // App.js
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   ScrollView,
   StyleSheet,
   StatusBar,
   Alert,
-  Linking,   // <— IMPORTANTE
+  Linking,
 } from 'react-native';
 
 import Header from './src/components/Header';
@@ -18,12 +18,36 @@ import Footer from './src/components/Footer';
 import ProductCatalog from './src/components/ProductCatalog';
 import CartPage from './src/components/CartPage';
 
-const WHATSAPP_NUMBER = '5521989036236'; // número que você passou
+const WHATSAPP_NUMBER = '5521989036236';
 
 export default function App() {
   const [view, setView] = useState('home'); // 'home' | 'catalog' | 'cart'
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const scrollRef = useRef(null);
+  const sectionPositions = useRef({
+    hero: 0,
+    about: 0,
+    products: 0,
+    contact: 0,
+  });
+  const [pendingSection, setPendingSection] = useState(null);
+
+  // salva a posição de cada seção
+  const handleSectionLayout = (section) => (event) => {
+    const { y } = event.nativeEvent.layout;
+    sectionPositions.current[section] = y;
+  };
+
+  // quando a view volta para home e tem seção pendente, faz o scroll
+  useEffect(() => {
+    if (view === 'home' && pendingSection && scrollRef.current) {
+      const y = sectionPositions.current[pendingSection] || 0;
+      scrollRef.current.scrollTo({ y, animated: true });
+      setPendingSection(null);
+    }
+  }, [view, pendingSection]);
 
   function addToCart(product) {
     setCartItems((current) => {
@@ -39,7 +63,7 @@ export default function App() {
       }
       return [...current, { product, quantity: 1 }];
     });
-    setIsCartOpen(true); // abre o dropdown pra mostrar
+    setIsCartOpen(true);
   }
 
   function updateQuantity(productId, delta) {
@@ -48,7 +72,7 @@ export default function App() {
         .map((item) => {
           if (item.product.id !== productId) return item;
           const newQty = item.quantity + delta;
-          if (newQty <= 0) return null; // remove se chegar em 0
+          if (newQty <= 0) return null;
           return { ...item, quantity: newQty };
         })
         .filter(Boolean);
@@ -66,9 +90,10 @@ export default function App() {
     setIsCartOpen((prev) => !prev);
   }
 
-  function goToHome() {
-    setView('home');
+  function goToHomeSection(section = 'hero') {
     setIsCartOpen(false);
+    setPendingSection(section);
+    setView('home');
   }
 
   function goToCatalog() {
@@ -111,8 +136,7 @@ export default function App() {
 
     const mensagem =
       `Olá! Gostaria de finalizar uma compra na CaiCai Papelaria.\n\n` +
-      `Itens selecionados:\n` +
-      `${itensTexto}\n\n` +
+      `Itens selecionados:\n${itensTexto}\n\n` +
       `Total: R$ ${total.toFixed(2).replace('.', ',')}\n\n` +
       `Por favor, me informe as opções de entrega e pagamento.`;
 
@@ -128,11 +152,30 @@ export default function App() {
     });
   }
 
+  // ÍCONES SOCIAIS
+  function handleOpenWhatsAppIcon() {
+    Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`).catch(() =>
+      Alert.alert('Erro', 'Não foi possível abrir o WhatsApp.')
+    );
+  }
+
+  function handleOpenFacebook() {
+    Linking.openURL('https://facebook.com/seupagina').catch(() =>
+      Alert.alert('Erro', 'Não foi possível abrir o Facebook.')
+    );
+  }
+
+  function handleOpenInstagram() {
+    Linking.openURL('https://instagram.com/seupagina').catch(() =>
+      Alert.alert('Erro', 'Não foi possível abrir o Instagram.')
+    );
+  }
+
   let content;
   if (view === 'catalog') {
     content = (
       <ProductCatalog
-        onBack={goToHome}
+        onBack={() => goToHomeSection('products')}
         onAddToCart={addToCart}
       />
     );
@@ -140,7 +183,7 @@ export default function App() {
     content = (
       <CartPage
         cartItems={cartItems}
-        onBack={goToHome}
+        onBack={() => goToHomeSection('hero')}
         onIncrement={(id) => updateQuantity(id, +1)}
         onDecrement={(id) => updateQuantity(id, -1)}
         onRemove={removeFromCart}
@@ -149,14 +192,29 @@ export default function App() {
     );
   } else {
     content = (
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Hero />
-        <SectionAbout />
-        <SectionProducts
-          onSeeMore={goToCatalog}
-          onAddToCart={addToCart}
-        />
-        <SectionContact />
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View onLayout={handleSectionLayout('hero')}>
+          <Hero />
+        </View>
+
+        <View onLayout={handleSectionLayout('about')}>
+          <SectionAbout />
+        </View>
+
+        <View onLayout={handleSectionLayout('products')}>
+          <SectionProducts
+            onSeeMore={goToCatalog}
+            onAddToCart={addToCart}
+          />
+        </View>
+
+        <View onLayout={handleSectionLayout('contact')}>
+          <SectionContact />
+        </View>
+
         <Footer />
       </ScrollView>
     );
@@ -171,8 +229,13 @@ export default function App() {
         isCartOpen={isCartOpen}
         onToggleCart={handleToggleCartDropdown}
         onGoToCart={goToCart}
-        onNavHome={goToHome}
-        onNavProducts={goToCatalog}
+        onNavHome={() => goToHomeSection('hero')}
+        onNavAbout={() => goToHomeSection('about')}
+        onNavProducts={() => goToHomeSection('products')}
+        onNavContact={() => goToHomeSection('contact')}
+        onOpenWhatsApp={handleOpenWhatsAppIcon}
+        onOpenFacebook={handleOpenFacebook}
+        onOpenInstagram={handleOpenInstagram}
       />
       {content}
     </View>
