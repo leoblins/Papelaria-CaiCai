@@ -1,198 +1,242 @@
 // src/components/SectionProducts.js
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   Image,
   Pressable,
+  useWindowDimensions,
 } from 'react-native';
-import PRODUCTS from './Products';   // <— aqui é o ajuste
 
-
-
+const BG = '#fffde1';
+const CARD_BG = '#ffffff';
 const RED = '#e63946';
 const PURPLE = '#7c3aed';
-const BLACK = '#111111';
-const BG = '#fff3bf';
+const SHADOW = 'rgba(0,0,0,0.12)';
+
+// 🔥 AGORA USANDO require() EM VEZ DE URL
+const HIGHLIGHT_PRODUCTS = [
+  {
+    id: 'real-madrid-caderno',
+    name: 'Caderno smart dac Real Madrid',
+    price: 76.9,
+    image: require('./assets/cadernoDivertidamente.png'),
+  },
+  {
+    id: 'aplicador-tag-yins',
+    name: 'Aplicador tag yins paper',
+    price: 28.9,
+    image: require('./assets/cadernoDivertidamente.png'),
+  },
+  {
+    id: 'lapis-acrilix-24',
+    name: 'Lápis acrilex 24 cores',
+    price: 16.9,
+    image: require('./assets/cadernoDivertidamente.png'),
+  },
+];
 
 export default function SectionProducts({ onSeeMore, onAddToCart }) {
-  // pega só alguns produtos para o carrossel
-  const featuredProducts = PRODUCTS.slice(0, 5);
-
-  function handleAdd(product) {
-    if (onAddToCart) {
-      onAddToCart(product);
-    }
-  }
+  const { width, height } = useWindowDimensions();
+  const { styles } = useMemo(() => createStyles(width, height), [width, height]);
 
   return (
     <View style={styles.section}>
       <View style={styles.inner}>
-        <Text style={styles.sectionTitle}>Nossos produtos</Text>
-        <Text style={styles.sectionSubtitle}>
-          Alguns dos itens que você encontra na nossa papelaria.
+        {/* TÍTULO */}
+        <Text style={styles.title}>Nossos Produtos</Text>
+
+        {/* SUBTÍTULO */}
+        <Text style={styles.subtitle}>
+          Confira alguns dos itens mais procurados da nossa loja.
         </Text>
 
-        {/* CARROSSEL HORIZONTAL */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.carouselContent}
-        >
-          {featuredProducts.map((product) => (
-            <View key={product.id} style={styles.card}>
-              <Image source={{ uri: product.image }} style={styles.cardImage} />
+        {/* GRID DE PRODUTOS */}
+        <View style={styles.grid}>
+          {HIGHLIGHT_PRODUCTS.map((product) => (
+            <Pressable
+              key={product.id}
+              onPress={onSeeMore}
+              style={({ hovered, pressed }) => [
+                styles.card,
+                (hovered || pressed) && styles.cardHover,
+              ]}
+            >
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={product.image}
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+              </View>
 
-              <View style={styles.cardBody}>
-                <Text style={styles.cardCategory}>{product.category}</Text>
-                <Text style={styles.cardName}>{product.name}</Text>
-                <Text style={styles.cardPrice}>
+              <View style={styles.cardContent}>
+                <Text style={styles.productName}>{product.name}</Text>
+                <Text style={styles.productPrice}>
                   R$ {product.price.toFixed(2).replace('.', ',')}
                 </Text>
 
-                <View style={styles.cardButtonsRow}>
-                  <Pressable
-                    style={styles.btnPrimary}
-                    onPress={() => handleAdd(product)}
-                  >
-                    <Text style={styles.btnPrimaryText}>Adicionar ao carrinho</Text>
-                  </Pressable>
-
-                  <Pressable
-                    style={styles.btnOutline}
-                    onPress={onSeeMore}
-                  >
-                    <Text style={styles.btnOutlineText}>Ver mais</Text>
-                  </Pressable>
-                </View>
+                <Pressable
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    onAddToCart(product);
+                  }}
+                  style={({ hovered, pressed }) => [
+                    styles.buyButton,
+                    (hovered || pressed) && styles.buyButtonHover,
+                  ]}
+                >
+                  <Text style={styles.buyButtonText}>
+                    Adicionar ao carrinho
+                  </Text>
+                </Pressable>
               </View>
-            </View>
+            </Pressable>
           ))}
-        </ScrollView>
-
-        {/* BOTÃO VER TODOS */}
-        <View style={styles.seeAllWrapper}>
-          <Pressable style={styles.btnSeeAll} onPress={onSeeMore}>
-            <Text style={styles.btnSeeAllText}>Ver todos os produtos</Text>
-          </Pressable>
         </View>
+
+        {/* BOTÃO VER MAIS */}
+        <Pressable
+          onPress={onSeeMore}
+          style={({ hovered, pressed }) => [
+            styles.moreButton,
+            (hovered || pressed) && styles.moreButtonHover,
+          ]}
+        >
+          <Text style={styles.moreButtonText}>Ver Mais</Text>
+        </Pressable>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  section: {
-    backgroundColor: BG,
-    paddingVertical: 40,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-  },
-  inner: {
-    width: '100%',
-    maxWidth: 1100,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: RED,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    fontSize: 13,
-    color: PURPLE,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  carouselContent: {
-    paddingVertical: 4,
-  },
+function createStyles(width, height) {
+  const isSmall = width < 700;
+  const isMedium = width >= 700 && width < 1100;
 
-  card: {
-    width: 260,
-    marginRight: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  cardImage: {
-    width: '100%',
-    height: 140,
-  },
-  cardBody: {
-    padding: 12,
-  },
-  cardCategory: {
-    fontSize: 11,
-    color: PURPLE,
-    marginBottom: 4,
-  },
-  cardName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: BLACK,
-    marginBottom: 6,
-  },
-  cardPrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: RED,
-    marginBottom: 10,
-  },
-  cardButtonsRow: {
-    flexDirection: 'column',
-    gap: 6,
-  },
-  btnPrimary: {
-    backgroundColor: RED,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 999,
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  btnPrimaryText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  btnOutline: {
-    borderColor: RED,
-    borderWidth: 1,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 999,
-    alignItems: 'center',
-  },
-  btnOutlineText: {
-    color: RED,
-    fontSize: 12,
-    fontWeight: '600',
-  },
+  let cardSize = '32%';
+  if (isMedium) cardSize = '48%';
+  if (isSmall) cardSize = '100%';
 
-  seeAllWrapper: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  btnSeeAll: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: RED,
-    paddingHorizontal: 22,
-    paddingVertical: 10,
-    backgroundColor: '#fff',
-  },
-  btnSeeAllText: {
-    color: RED,
-    fontWeight: '600',
-    fontSize: 14,
-  },
-});
+  const webTransition = {
+    // essas propriedades só fazem efeito no web
+    transitionDuration: '150ms',
+    transitionProperty: 'transform',
+    transitionTimingFunction: 'ease-out',
+  };
+
+  const styles = StyleSheet.create({
+    section: {
+      width: '100%',
+      backgroundColor: BG,
+      paddingHorizontal: 16,
+      paddingVertical: 40,
+      alignItems: 'center',
+      minHeight: height * 0.9,
+    },
+    inner: {
+      width: '100%',
+      maxWidth: 1280,
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      color: RED,
+      textAlign: 'center',
+      marginBottom: 6,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: PURPLE,
+      textAlign: 'center',
+      marginBottom: 60,
+    },
+    grid: {
+      width: '100%',
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 24,
+    },
+    card: {
+      flexBasis: cardSize,
+      backgroundColor: CARD_BG,
+      borderRadius: 20,
+      padding: 18,
+      shadowColor: SHADOW,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.4,
+      shadowRadius: 10,
+      elevation: 4,
+      transform: [{ scale: 1 }],
+      ...webTransition,
+    },
+    cardHover: {
+      transform: [{ scale: 1.03 }],
+    },
+    imageWrapper: {
+      width: '100%',
+      height: 300,
+      marginBottom: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+      borderRadius: 12,
+    },
+    cardContent: {
+      gap: 8,
+    },
+    productName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: PURPLE,
+    },
+    productPrice: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: RED,
+      marginBottom: 8,
+    },
+    buyButton: {
+      alignSelf: 'flex-start',
+      backgroundColor: RED,
+      borderRadius: 999,
+      paddingVertical: 8,
+      paddingHorizontal: 14,
+      ...webTransition,
+    },
+    buyButtonHover: {
+      backgroundColor: '#c72b33', 
+    },
+
+    buyButtonText: {
+      color: '#fff',
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    moreButton: {
+      marginTop: 50,
+      backgroundColor: RED,
+      borderRadius: 999,
+      paddingVertical: 10,
+      paddingHorizontal: 32,
+      transform: [{ scale: 1 }],
+      ...webTransition,
+    },
+    moreButtonHover: {
+      transform: [{ scale: 1.05 }],
+    },
+    moreButtonText: {
+      color: '#fff',
+      fontWeight: '700',
+      fontSize: 15,
+    },
+  });
+
+  return { styles };
+}
