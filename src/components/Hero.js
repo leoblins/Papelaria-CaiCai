@@ -1,156 +1,227 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ImageBackground,
+  Animated,
   useWindowDimensions,
-} from 'react-native';
+} from "react-native";
 
-const CAROUSEL_SLIDES = [
+const SLIDES = [
   {
-    title: 'Bem-vindo à CaiCai Papelaria',
-    text: 'Tudo o que você precisa para escritório, escola e artesanato em um só lugar.',
-    image:
-      'https://images.unsplash.com/photo-1526498460520-4c246339dccb?auto=format&fit=crop&w=1600&q=80',
+    tag: "VOLTA ÀS AULAS",
+    title: "Bem-vindo à Cai Cai Papelaria",
+    description:
+      "Cadernos, agendas, planners e muito mais para organizar sua rotina.\nEncontre tudo em um só lugar com atendimento de confiança.",
+    image: require("./assets/cadernoRealMadrid.png"),
+    accentColor: "#FF5252",
+    overlayColor: "rgba(255, 82, 82, 0.22)",
   },
   {
-    title: 'Material escolar completo',
-    text: 'Cadernos, mochilas, estojos, lápis e muito mais para a volta às aulas.',
-    image:
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80',
+    tag: "OFERTAS ESPECIAIS",
+    title: "Material escolar completo",
+    description:
+      "Lápis de cor, canetas, mochilas, estojos e kits criativos com preços que cabem no seu bolso.\nPerfeito para montar o enxoval escolar sem dor de cabeça.",
+    image: require("./assets/lapisacrilex1.png"),
+    accentColor: "#FF9800",
+    overlayColor: "rgba(255, 152, 0, 0.23)",
   },
   {
-    title: 'Papelaria criativa',
-    text: 'Planners, adesivos, canetas coloridas e itens para deixar sua rotina mais leve.',
-    image:
-      'https://images.unsplash.com/photo-1526498460520-4c246339dccb?auto=format&fit=crop&w=1600&q=80',
+    tag: "ORGANIZE SEU ESCRITÓRIO",
+    title: "Materiais de escritórios",
+    description:
+      "Etiquetadores, pastas, blocos, clips, canetas e acessórios para deixar seu dia a dia mais prático.\nMais produtividade, praticidade e organização para o seu negócio.",
+    image: require("./assets/furadera2.png"),
+    accentColor: "#7B1FA2",
+    overlayColor: "rgba(123, 31, 162, 0.23)",
   },
 ];
 
-const RED = '#e63946';
-const WHITE = '#ffffff';
-
 export default function Hero() {
-  const [carouselIndex, setCarouselIndex] = useState(0);
-  const { width, height } = useWindowDimensions();
+  const [index, setIndex] = useState(0);
+  const fade = useRef(new Animated.Value(0)).current;
+
+  const { width } = useWindowDimensions();
+
+  // altura do banner responsiva
+  const bannerHeight =
+    width >= 1200 ? 420 : width >= 900 ? 380 : width >= 600 ? 340 : 300;
 
   useEffect(() => {
-    const id = setInterval(
-      () => setCarouselIndex((prev) => (prev + 1) % CAROUSEL_SLIDES.length),
-      5000
-    );
-    return () => clearInterval(id);
-  }, []);
+    const fadeIn = () =>
+      Animated.timing(fade, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
 
-  const currentSlide = CAROUSEL_SLIDES[carouselIndex];
+    const fadeOut = (onEnd) =>
+      Animated.timing(fade, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }).start(onEnd);
 
-  const isMobile = width < 768;
+    fadeIn();
+    const interval = setInterval(() => {
+      fadeOut(() => {
+        setIndex((prev) => (prev + 1) % SLIDES.length);
+        fadeIn();
+      });
+    }, 6000);
 
-  const bannerHeight = Math.max(
-    320,
-    Math.min(height * (isMobile ? 0.6 : 0.8), 560)
-  );
+    return () => clearInterval(interval);
+  }, [fade, index]);
+
+  const slide = SLIDES[index];
 
   return (
-    <View style={[styles.hero, { minHeight: height * 0.9 }]}>
-      <View style={styles.heroCarousel}>
-        <View style={styles.slideWrapper}>
-          <ImageBackground
-            source={{ uri: currentSlide.image }}
-            style={[styles.slideImage, { height: bannerHeight }]}
-            imageStyle={styles.slideImageInner}
-          >
-            <View
-              style={[
-                styles.slideOverlay,
-                isMobile && styles.slideOverlayMobile,
-              ]}
-            >
-              <Text style={styles.carouselTitle}>{currentSlide.title}</Text>
-              <Text style={styles.carouselText}>{currentSlide.text}</Text>
-            </View>
-          </ImageBackground>
-        </View>
+    <View style={styles.hero}>
+      <Animated.View style={[styles.carouselBox, { opacity: fade }]}>
+        <ImageBackground
+          source={slide.image}
+          resizeMode="contain"
+          style={[
+            styles.banner,
+            {
+              height: bannerHeight,
+              paddingTop: bannerHeight * 0.18, 
+            },
+          ]}
+          imageStyle={styles.bannerImage}
+        >
+          <View
+            style={[
+              styles.overlay,
+              { backgroundColor: slide.overlayColor || "transparent" },
+            ]}
+          />
 
-        <View style={styles.carouselDots}>
-          {CAROUSEL_SLIDES.map((_, index) => (
+          <View style={styles.content}>
+            {slide.tag && (
+              <View
+                style={[
+                  styles.tagPill,
+                  { backgroundColor: slide.accentColor },
+                ]}
+              >
+                <Text style={styles.tagText}>{slide.tag}</Text>
+              </View>
+            )}
+
+            <Text style={styles.title}>{slide.title.toUpperCase()}</Text>
+            <Text style={styles.subtitle}>{slide.description}</Text>
+          </View>
+        </ImageBackground>
+
+        {/* dots */}
+        <View className="dots" style={styles.dots}>
+          {SLIDES.map((_, i) => (
             <View
-              key={index}
+              key={i}
               style={[
                 styles.dot,
-                index === carouselIndex && styles.dotActive,
+                i === index && styles.dotActive,
+                i === index && {
+                  backgroundColor: slide.accentColor,
+                  borderColor: slide.accentColor,
+                },
               ]}
             />
           ))}
         </View>
-      </View>
+      </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   hero: {
-    width: '100%',
-    paddingHorizontal: 16,
-    paddingVertical: 24,
-    backgroundColor: '#fffdf0',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1,
+    width: "100%",
+    backgroundColor: "#fffde1",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 100,
   },
 
-  heroCarousel: {
-    width: '100%',
-    alignItems: 'center',
+  carouselBox: {
+    width: "92%",
+    maxWidth: 1280,
+    alignItems: "center",
   },
-  slideWrapper: {
-    width: '100%',
-    maxWidth: 1200,
-    borderRadius: 22,
-    overflow: 'hidden',
+
+  banner: {
+    width: "100%",
+    justifyContent: "flex-start", 
+    borderRadius: 26,
+    overflow: "hidden",
   },
-  slideImage: {
-    justifyContent: 'center',
+
+  bannerImage: {
+    opacity: 0.38,
   },
-  slideImageInner: {
-    borderRadius: 22,
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
   },
-  slideOverlay: {
-    marginHorizontal: '18%',
-    paddingVertical: 28,
-    paddingHorizontal: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
-    borderRadius: 18,
-    alignItems: 'center',
+
+  content: {
+    paddingHorizontal: 32,
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
   },
-  slideOverlayMobile: {
-    marginHorizontal: '8%',
-  },
-  carouselTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: WHITE,
-    textAlign: 'center',
+
+  tagPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+    borderRadius: 999,
     marginBottom: 10,
   },
-  carouselText: {
-    fontSize: 15,
-    color: WHITE,
-    textAlign: 'center',
+
+  tagText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 1,
   },
-  carouselDots: {
-    flexDirection: 'row',
-    marginTop: 12,
+
+  title: {
+    color: "#fff",
+    fontSize: 38,
+    fontWeight: "900",
+    textTransform: "uppercase",
+    marginBottom: 12,
+    letterSpacing: 1.2,
+    textShadowColor: "rgba(0,0,0,0.35)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 6,
   },
+
+  subtitle: {
+    color: "#fff",
+    fontSize: 20,
+    lineHeight: 30,
+    maxWidth: 560,
+  },
+
+  dots: {
+    flexDirection: "row",
+    marginTop: 18,
+  },
+
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 999,
-    backgroundColor: '#e3d7a7',
-    marginRight: 6,
+    width: 10,
+    height: 10,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: "#fff",
+    marginHorizontal: 4,
+    backgroundColor: "transparent",
   },
+
   dotActive: {
-    backgroundColor: RED,
-    width: 18,
+    // cor vem dinamicamente
   },
 });

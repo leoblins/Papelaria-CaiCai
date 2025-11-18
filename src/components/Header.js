@@ -16,7 +16,7 @@ const PURPLE = '#4b2faf';
 export default function Header({
   cartItems = [],
   totalItems = 0,
-  isCartOpen = false, 
+  isCartOpen = false,
   onToggleCart,
   onGoToCart,
   onNavHome,
@@ -96,6 +96,23 @@ export default function Header({
                 </Text>
               </Pressable>
 
+              {/* PRODUTOS AGORA VEM ANTES */}
+              <Pressable
+                onPress={onNavProducts}
+                onHoverIn={() => setHoverMenu('prod')}
+                onHoverOut={() => setHoverMenu(null)}
+              >
+                <Text
+                  style={[
+                    styles.menuItem,
+                    hoverMenu === 'prod' && styles.hoverText,
+                  ]}
+                >
+                  Produtos
+                </Text>
+              </Pressable>
+
+              {/* QUEM SOMOS DEPOIS */}
               {onNavAbout && (
                 <Pressable
                   onPress={onNavAbout}
@@ -112,21 +129,6 @@ export default function Header({
                   </Text>
                 </Pressable>
               )}
-
-              <Pressable
-                onPress={onNavProducts}
-                onHoverIn={() => setHoverMenu('prod')}
-                onHoverOut={() => setHoverMenu(null)}
-              >
-                <Text
-                  style={[
-                    styles.menuItem,
-                    hoverMenu === 'prod' && styles.hoverText,
-                  ]}
-                >
-                  Produtos
-                </Text>
-              </Pressable>
 
               {onNavContact && (
                 <Pressable

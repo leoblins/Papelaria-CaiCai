@@ -21,17 +21,18 @@ import CartSidePanel from './src/components/CartSidePanel';
 const WHATSAPP_NUMBER = '5521989036236';
 
 export default function App() {
-  const [view, setView] = useState('home'); 
+  const [view, setView] = useState('home');
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const scrollRef = useRef(null);
   const sectionPositions = useRef({
     hero: 0,
-    about: 0,
     products: 0,
+    about: 0,
     contact: 0,
   });
+
   const [pendingSection, setPendingSection] = useState(null);
 
   const handleSectionLayout = (section) => (event) => {
@@ -49,9 +50,7 @@ export default function App() {
 
   function addToCart(product) {
     setCartItems((current) => {
-      const existing = current.find(
-        (item) => item.product.id === product.id
-      );
+      const existing = current.find((item) => item.product.id === product.id);
       if (existing) {
         return current.map((item) =>
           item.product.id === product.id
@@ -110,10 +109,7 @@ export default function App() {
 
   function handleCheckout(extraInfo) {
     if (!cartItems.length) {
-      Alert.alert(
-        'Carrinho vazio',
-        'Adicione algum produto antes de finalizar.'
-      );
+      Alert.alert('Carrinho vazio', 'Adicione algum produto antes de finalizar.');
       return;
     }
 
@@ -152,12 +148,10 @@ export default function App() {
       `?text=${encodeURIComponent(mensagem)}`;
 
     Linking.openURL(url).catch(() => {
-      Alert.alert(
-        'Não foi possível abrir o WhatsApp',
-        'Verifique se o aplicativo está instalado ou tente novamente.'
-      );
+      Alert.alert('Erro', 'Não foi possível abrir o WhatsApp.');
     });
   }
+
   function handleOpenWhatsAppIcon() {
     Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`).catch(() =>
       Alert.alert('Erro', 'Não foi possível abrir o WhatsApp.')
@@ -178,11 +172,7 @@ export default function App() {
 
   let content;
   if (view === 'catalog') {
-    content = (
-      <ProductCatalog
-        onAddToCart={addToCart}
-      />
-    );
+    content = <ProductCatalog onAddToCart={addToCart} />;
   } else if (view === 'cart') {
     content = (
       <CartPage
@@ -196,24 +186,22 @@ export default function App() {
     );
   } else {
     content = (
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={styles.scrollContent}
-      >
+      <ScrollView ref={scrollRef} contentContainerStyle={styles.scrollContent}>
         <View onLayout={handleSectionLayout('hero')}>
           <Hero />
         </View>
 
+        {/* ---------------------------- */}
+        {/* 🔥 PRODUTOS AGORA VEM ANTES */}
+        <View onLayout={handleSectionLayout('products')}>
+          <SectionProducts onSeeMore={goToCatalog} onAddToCart={addToCart} />
+        </View>
+
+        {/* 🔥 QUEM SOMOS AGORA DEPOIS */}
         <View onLayout={handleSectionLayout('about')}>
           <SectionAbout />
         </View>
-
-        <View onLayout={handleSectionLayout('products')}>
-          <SectionProducts
-            onSeeMore={goToCatalog}
-            onAddToCart={addToCart}
-          />
-        </View>
+        {/* ---------------------------- */}
 
         <View onLayout={handleSectionLayout('contact')}>
           <SectionContact />
@@ -232,6 +220,7 @@ export default function App() {
   return (
     <View style={styles.root}>
       <StatusBar barStyle="dark-content" />
+
       <Header
         cartItems={cartItems}
         totalItems={totalItems}
@@ -246,9 +235,9 @@ export default function App() {
         onOpenFacebook={handleOpenFacebook}
         onOpenInstagram={handleOpenInstagram}
       />
+
       {content}
 
-      {/* PAINEL LATERAL DO CARRINHO */}
       <CartSidePanel
         visible={isCartOpen}
         cartItems={cartItems}
