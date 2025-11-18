@@ -16,7 +16,6 @@ import SectionProducts from './src/components/SectionProducts';
 import SectionContact from './src/components/SectionContact';
 import Footer from './src/components/Footer';
 import ProductCatalog from './src/components/ProductCatalog';
-import CartPage from './src/components/CartPage';
 import CartSidePanel from './src/components/CartSidePanel';
 
 const WHATSAPP_NUMBER = '5521989036236';

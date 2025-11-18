@@ -1,3 +1,4 @@
+// src/components/SectionContact.js
 import React, { useState } from 'react';
 import {
   View,
@@ -33,42 +34,77 @@ export default function SectionContact() {
   const [isHoverSubmit, setIsHoverSubmit] = useState(false);
   const [isPressSubmit, setIsPressSubmit] = useState(false);
 
+  // erros por campo
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+
   function validateEmail(value) {
     return /\S+@\S+\.\S+/.test(value);
   }
 
   async function handleSubmit() {
-    if (!name.trim() || !email.trim() || !message.trim()) {
-      Alert.alert('Campos obrigatórios', 'Preencha Nome, E-mail e Mensagem.');
-      return;
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    const trimmedMessage = message.trim();
+
+    const newErrors = {
+      name: '',
+      email: '',
+      message: '',
+    };
+    let hasError = false;
+
+    if (!trimmedName) {
+      newErrors.name = 'Nome é obrigatório';
+      hasError = true;
     }
 
-    if (!validateEmail(email.trim())) {
-      Alert.alert('E-mail inválido', 'Digite um e-mail válido.');
-      return;
+    if (!trimmedEmail) {
+      newErrors.email = 'E-mail é obrigatório';
+      hasError = true;
+    } else if (!validateEmail(trimmedEmail)) {
+      newErrors.email = 'Digite um e-mail válido';
+      hasError = true;
+    }
+
+    if (!trimmedMessage) {
+      newErrors.message = 'Mensagem é obrigatória';
+      hasError = true;
+    }
+
+    if (hasError) {
+      setErrors(newErrors);
+      return; // não envia nada
     }
 
     setIsSubmitting(true);
     setSuccessMsg('');
+    setErrors({ name: '', email: '', message: '' });
 
     const templateParams = {
-      from_name: name,
-      from_email: email,
+      from_name: trimmedName,
+      from_email: trimmedEmail,
       subject: subject || 'Sem assunto',
-      message,
+      message: trimmedMessage,
     };
 
     try {
-      const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          service_id: EMAILJS_SERVICE_ID,
-          template_id: EMAILJS_TEMPLATE_ID,
-          user_id: EMAILJS_PUBLIC_KEY,
-          template_params: templateParams,
-        }),
-      });
+      const response = await fetch(
+        'https://api.emailjs.com/api/v1.0/email/send',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            service_id: EMAILJS_SERVICE_ID,
+            template_id: EMAILJS_TEMPLATE_ID,
+            user_id: EMAILJS_PUBLIC_KEY,
+            template_params: templateParams,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Falha ao enviar');
@@ -108,30 +144,55 @@ export default function SectionContact() {
         ) : null}
 
         <View style={styles.formCard}>
+          {/* NOME */}
           <View style={styles.field}>
             <Text style={styles.label}>Nome*</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                errors.name && styles.inputError,
+              ]}
               placeholder="Digite seu nome"
               placeholderTextColor="#b5b5b5"
               value={name}
-              onChangeText={setName}
+              onChangeText={(value) => {
+                setName(value);
+                if (errors.name) {
+                  setErrors((prev) => ({ ...prev, name: '' }));
+                }
+              }}
             />
+            {errors.name ? (
+              <Text style={styles.errorText}>{errors.name}</Text>
+            ) : null}
           </View>
 
+          {/* EMAIL */}
           <View style={styles.field}>
             <Text style={styles.label}>E-mail*</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                errors.email && styles.inputError,
+              ]}
               placeholder="Digite seu e-mail"
               placeholderTextColor="#b5b5b5"
               keyboardType="email-address"
               autoCapitalize="none"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(value) => {
+                setEmail(value);
+                if (errors.email) {
+                  setErrors((prev) => ({ ...prev, email: '' }));
+                }
+              }}
             />
+            {errors.email ? (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            ) : null}
           </View>
 
+          {/* ASSUNTO (opcional) */}
           <View style={styles.field}>
             <Text style={styles.label}>Assunto</Text>
             <TextInput
@@ -143,17 +204,30 @@ export default function SectionContact() {
             />
           </View>
 
+          {/* MENSAGEM */}
           <View style={styles.field}>
             <Text style={styles.label}>Mensagem*</Text>
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[
+                styles.input,
+                styles.textArea,
+                errors.message && styles.inputError,
+              ]}
               placeholder="Digite sua mensagem"
               placeholderTextColor="#b5b5b5"
               multiline
               textAlignVertical="top"
               value={message}
-              onChangeText={setMessage}
+              onChangeText={(value) => {
+                setMessage(value);
+                if (errors.message) {
+                  setErrors((prev) => ({ ...prev, message: '' }));
+                }
+              }}
             />
+            {errors.message ? (
+              <Text style={styles.errorText}>{errors.message}</Text>
+            ) : null}
           </View>
 
           <Pressable
@@ -202,7 +276,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: PURPLE,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 50,
   },
 
   successBox: {
@@ -247,6 +321,14 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     fontSize: 16,
     backgroundColor: '#fff',
+  },
+  inputError: {
+    borderColor: RED,
+  },
+  errorText: {
+    marginTop: 4,
+    fontSize: 12,
+    color: RED,
   },
   textArea: {
     minHeight: 110,
