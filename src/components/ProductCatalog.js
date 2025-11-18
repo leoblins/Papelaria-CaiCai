@@ -1,3 +1,4 @@
+// src/components/ProductCatalog.js
 import React, { useMemo, useState } from "react";
 import {
   View,
@@ -20,7 +21,7 @@ const CARD_BG = "#ffffff";
 
 export default function ProductCatalog({ onAddToCart }) {
   const { width, height } = useWindowDimensions();
-  const { styles } = useMemo(() => createStyles(width, height), [width]);
+  const { styles } = useMemo(() => createStyles(width, height), [width, height]);
 
   const [search, setSearch] = useState("");
   const [searchApplied, setSearchApplied] = useState(false);
@@ -36,16 +37,13 @@ export default function ProductCatalog({ onAddToCart }) {
   function applyFilters() {
     let list = [...PRODUCTS];
 
+    // 🔎 filtro por descrição
     if (searchApplied && search.trim() !== "") {
       const term = normalize(search);
-      list = list.filter(
-        (p) =>
-          normalize(p.name).includes(term) ||
-          normalize(p.category).includes(term)
-      );
+      list = list.filter((p) => normalize(p.descricao).includes(term));
     }
 
-
+    // ordenação por preço
     if (sortPrice === "asc") {
       list.sort((a, b) => a.price - b.price);
     } else if (sortPrice === "desc") {
@@ -71,13 +69,13 @@ export default function ProductCatalog({ onAddToCart }) {
     <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
       <View style={styles.section}>
         <View style={styles.inner}>
-
           <Text style={styles.title}>Catálogo Completo</Text>
 
           <Text style={styles.subtitle}>
             Navegue por todos os produtos disponíveis na CaiCai Papelaria
           </Text>
 
+          {/* 🔍 BUSCA E ORDENAÇÃO */}
           <View style={styles.searchRow}>
             <TextInput
               style={styles.searchInput}
@@ -88,11 +86,11 @@ export default function ProductCatalog({ onAddToCart }) {
               onSubmitEditing={handleSearch}
             />
 
-            {/* Botão Buscar */}
             <Pressable style={styles.searchBtn} onPress={handleSearch}>
               <Text style={styles.searchBtnText}>🔎</Text>
             </Pressable>
 
+            {/* select está em HTML (para web). Se for só mobile, isso não funciona. */}
             <select
               value={sortPrice}
               onChange={(e) => setSortPrice(e.target.value)}
@@ -111,14 +109,14 @@ export default function ProductCatalog({ onAddToCart }) {
               <option value="desc">Maior preço</option>
             </select>
 
-            {/* Botão Limpar */}
-            {searchApplied || sortPrice ? (
+            {(searchApplied || sortPrice) && (
               <Pressable style={styles.clearBtn} onPress={clearFilters}>
                 <Text style={styles.clearBtnText}>Limpar</Text>
               </Pressable>
-            ) : null}
+            )}
           </View>
 
+          {/* GRID DE PRODUTOS */}
           <View style={styles.grid}>
             {filtered.map((product) => (
               <Pressable
@@ -128,12 +126,14 @@ export default function ProductCatalog({ onAddToCart }) {
                   hovered && styles.cardHover,
                 ]}
               >
-                <Image source={{ uri: product.image }} style={styles.cardImage} />
+                {/* 👇 AQUI ESTAVA O PROBLEMA: agora usa require diretamente */}
+                <Image source={product.image} style={styles.cardImage} />
 
                 <View style={styles.cardBody}>
-                  <Text style={styles.cardCategory}>{product.category}</Text>
+                  {/* Se quiser categorias no futuro, pode adicionar aqui */}
+                  {/* <Text style={styles.cardCategory}>{product.category}</Text> */}
 
-                  <Text style={styles.cardName}>{product.name}</Text>
+                  <Text style={styles.cardName}>{product.descricao}</Text>
 
                   <Text style={styles.cardPrice}>
                     R$ {product.price.toFixed(2).replace(".", ",")}
@@ -146,7 +146,9 @@ export default function ProductCatalog({ onAddToCart }) {
                     ]}
                     onPress={() => onAddToCart(product)}
                   >
-                    <Text style={styles.btnPrimaryText}>Adicionar ao carrinho</Text>
+                    <Text style={styles.btnPrimaryText}>
+                      Adicionar ao carrinho
+                    </Text>
                   </Pressable>
                 </View>
               </Pressable>

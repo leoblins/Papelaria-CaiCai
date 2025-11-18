@@ -18,7 +18,7 @@ import Footer from './src/components/Footer';
 import ProductCatalog from './src/components/ProductCatalog';
 import CartSidePanel from './src/components/CartSidePanel';
 
-const WHATSAPP_NUMBER = '5521989036236';
+const WHATSAPP_NUMBER = '5521998055374';
 
 export default function App() {
   const [view, setView] = useState('home');
@@ -159,13 +159,13 @@ export default function App() {
   }
 
   function handleOpenFacebook() {
-    Linking.openURL('https://facebook.com/seupagina').catch(() =>
+    Linking.openURL('https://www.facebook.com/caicaipapelaria').catch(() =>
       Alert.alert('Erro', 'Não foi possível abrir o Facebook.')
     );
   }
 
   function handleOpenInstagram() {
-    Linking.openURL('https://instagram.com/seupagina').catch(() =>
+    Linking.openURL('https://www.instagram.com/caicaipapelaria/').catch(() =>
       Alert.alert('Erro', 'Não foi possível abrir o Instagram.')
     );
   }
@@ -191,17 +191,14 @@ export default function App() {
           <Hero />
         </View>
 
-        {/* ---------------------------- */}
-        {/* 🔥 PRODUTOS AGORA VEM ANTES */}
         <View onLayout={handleSectionLayout('products')}>
           <SectionProducts onSeeMore={goToCatalog} onAddToCart={addToCart} />
         </View>
 
-        {/* 🔥 QUEM SOMOS AGORA DEPOIS */}
+
         <View onLayout={handleSectionLayout('about')}>
           <SectionAbout />
         </View>
-        {/* ---------------------------- */}
 
         <View onLayout={handleSectionLayout('contact')}>
           <SectionContact />
