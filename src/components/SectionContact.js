@@ -1,4 +1,4 @@
-// src/components/SectionContact.js
+
 import React, { useState } from 'react';
 import {
   View,

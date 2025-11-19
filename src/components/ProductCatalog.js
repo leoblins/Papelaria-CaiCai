@@ -1,4 +1,4 @@
-// src/components/ProductCatalog.js
+
 import React, { useMemo, useState } from "react";
 import {
   View,
@@ -37,13 +37,13 @@ export default function ProductCatalog({ onAddToCart }) {
   function applyFilters() {
     let list = [...PRODUCTS];
 
-    // 🔎 filtro por descrição
+    
     if (searchApplied && search.trim() !== "") {
       const term = normalize(search);
       list = list.filter((p) => normalize(p.descricao).includes(term));
     }
 
-    // ordenação por preço
+    
     if (sortPrice === "asc") {
       list.sort((a, b) => a.price - b.price);
     } else if (sortPrice === "desc") {
@@ -75,7 +75,7 @@ export default function ProductCatalog({ onAddToCart }) {
             Navegue por todos os produtos disponíveis na CaiCai Papelaria
           </Text>
 
-          {/* 🔍 BUSCA E ORDENAÇÃO */}
+          {}
           <View style={styles.searchRow}>
             <TextInput
               style={styles.searchInput}
@@ -90,7 +90,7 @@ export default function ProductCatalog({ onAddToCart }) {
               <Text style={styles.searchBtnText}>🔎</Text>
             </Pressable>
 
-            {/* select está em HTML (para web). Se for só mobile, isso não funciona. */}
+            {}
             <select
               value={sortPrice}
               onChange={(e) => setSortPrice(e.target.value)}
@@ -116,7 +116,7 @@ export default function ProductCatalog({ onAddToCart }) {
             )}
           </View>
 
-          {/* GRID DE PRODUTOS */}
+          {}
           <View style={styles.grid}>
             {filtered.map((product) => (
               <Pressable
@@ -126,12 +126,12 @@ export default function ProductCatalog({ onAddToCart }) {
                   hovered && styles.cardHover,
                 ]}
               >
-                {/* 👇 AQUI ESTAVA O PROBLEMA: agora usa require diretamente */}
+                {}
                 <Image source={product.image} style={styles.cardImage} />
 
                 <View style={styles.cardBody}>
-                  {/* Se quiser categorias no futuro, pode adicionar aqui */}
-                  {/* <Text style={styles.cardCategory}>{product.category}</Text> */}
+                  {}
+                  {}
 
                   <Text style={styles.cardName}>{product.descricao}</Text>
 
@@ -201,7 +201,7 @@ function createStyles(width, height) {
       marginBottom: 40,
     },
 
-    /* 🔍 PESQUISA */
+    
     searchRow: {
       width: "100%",
       maxWidth: 900,
@@ -248,7 +248,7 @@ function createStyles(width, height) {
       fontWeight: "700",
     },
 
-    /* GRID */
+    
     grid: {
       width: "100%",
       flexDirection: "row",
@@ -257,7 +257,7 @@ function createStyles(width, height) {
       gap: 24,
     },
 
-    /* CARD */
+    
     card: {
       flexBasis: cardBasis,
       maxWidth: 360,

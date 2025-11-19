@@ -123,7 +123,7 @@ export default function Footer({
 
           <View style={styles.devLine}>
             <Text style={styles.bottomText}>
-              Desenvolvido por VFGL Soluções –{' '}
+              Desenvolvido por LFGV Soluções –{' '}
             </Text>
 
             <Pressable

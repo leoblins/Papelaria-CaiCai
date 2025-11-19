@@ -19,19 +19,19 @@ const HIGHLIGHT_PRODUCTS = [
     id: 'real-madrid-caderno',
     name: 'Caderno smart dac Real Madrid',
     price: 76.9,
-    image: require('./assets/cadernoDivertidamente.png'),
+    image: require('./assets/cadernoRealMadrid.png'),
   },
   {
     id: 'aplicador-tag-yins',
-    name: 'Aplicador tag yins paper',
-    price: 28.9,
-    image: require('./assets/cadernoDivertidamente.png'),
+    name: 'Lapis de Cor Faber Castell Supersoft 100 cores',
+    price: 99.9,
+    image: require('./assets/lapisDeCorFaberSupersoft100.png'),
   },
   {
     id: 'lapis-acrilix-24',
-    name: 'Lápis acrilex 24 cores',
+    name: 'Kit escolar',
     price: 16.9,
-    image: require('./assets/cadernoDivertidamente.png'),
+    image: require('./assets/KitEscolar.jpg'),
   },
 ];
 

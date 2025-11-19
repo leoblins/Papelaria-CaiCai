@@ -77,9 +77,9 @@ export default function Header({
             </View>
           </Pressable>
 
-          {/* MENU + REDES + CARRINHO */}
+          {}
           <View style={styles.rightArea}>
-            {/* MENU */}
+            {}
             <View style={styles.menu}>
               <Pressable
                 onPress={onNavHome}
@@ -96,7 +96,7 @@ export default function Header({
                 </Text>
               </Pressable>
 
-              {/* PRODUTOS AGORA VEM ANTES */}
+              {}
               <Pressable
                 onPress={onNavProducts}
                 onHoverIn={() => setHoverMenu('prod')}
@@ -112,7 +112,7 @@ export default function Header({
                 </Text>
               </Pressable>
 
-              {/* QUEM SOMOS DEPOIS */}
+              {}
               {onNavAbout && (
                 <Pressable
                   onPress={onNavAbout}
@@ -148,7 +148,7 @@ export default function Header({
               )}
             </View>
 
-            {/* ÍCONES SOCIAIS */}
+            {}
             <View style={styles.socialArea}>
               <Pressable
                 onPress={onOpenInstagram}
